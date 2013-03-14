@@ -2,6 +2,9 @@ package gameWorld
 {
 	import Interface.ITick;
 	
+	import gameUnit.character.Player;
+	import gameUnit.data.PlayerVO;
+	
 	import global.GlobalData;
 	
 	import tick.TickManager;
@@ -18,6 +21,12 @@ package gameWorld
 		{
 			initSelf();
 			map.loadMap(101);
+			for(var i:int = 0;i<500;i++)
+			{
+				var vo:PlayerVO = new PlayerVO();
+				vo.id = i+"";
+				addPlayer(vo,Math.random()*1000,Math.random()*1000);
+			}
 			TickManager.getInstance().addTick(this);
 		}
 		public function initSelf():void
@@ -26,6 +35,12 @@ package gameWorld
 			GlobalData.self.visible = true;
 			GlobalData.self.move(0,0);
 			CameraManager.getInstance().cameraTrace(GlobalData.self);
+		}
+		public function addPlayer(vo:PlayerVO,x:int,y:int):void
+		{
+			var player:Player = CharacterManager.getInstance().addPlayer(vo);
+			player.visible = true;
+			player.move(x,y);
 		}
 		public function update(duration:int):void
 		{

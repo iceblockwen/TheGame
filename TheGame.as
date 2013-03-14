@@ -42,7 +42,6 @@ package
 		protected function onGraphicsReady(event:Event):void
 		{
 			GraphicsEngine.getInstance().removeEventListener("CompleteInit",onGraphicsReady);
-			GraphicsEngine.getInstance().enableGaussianBlur(1);
 			LevelManager.getInstance().loadLevel();
 			
 		}

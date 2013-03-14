@@ -8,31 +8,36 @@ package gameUnit
 	import Evocati.object.BaseRigidBody;
 	import Evocati.textureUtils.TextureCoodinate;
 	
-	import Interface.IFrameAnimation;
-	
 	import gameUnit.data.RenderProperty;
 	
 	import resource.ResourceManager;
 
-	public class RenderUnit implements IFrameAnimation
+	public class RenderUnit
 	{
 		public static var pool:Array = [];
-		public var property:RenderProperty;
 		public var graphicInfo:Base2DRectObjInfo;
+		public var animationId:int;
 		
-		private var _url:String;
+		private var _preUrl:String;
+		private var _resUrl:String;
 		
 		private var _resData:ByteArray;
 		private var _resReady:int;
 		private var _visible:Boolean;
 		private var _body:BaseRigidBody;
 		private var _frame:int = 0;
+		private var _lock:Boolean = false;
 		
 		private var _x:Number;
 		private var _y:Number;
+		public var level:Number;
+		
+		public var id:String;
+		public var isAnimated:Boolean;
+		public var scaleX:Number = 1;
+		public var scaleY:Number = 1;
 		public function RenderUnit()
 		{
-			property = new RenderProperty();
 		}
 		public static function getInstance():RenderUnit
 		{
@@ -51,19 +56,23 @@ package gameUnit
 				GraphicsEngine.getInstance().addBatchSquare(getGraphicInfo());
 			}
 		}
-		public function set url(value:String):void
+		public function setPreUrl(value:String,headFrame:int):void
 		{
-			_url = value;
-			property.texId = _url;
-		}
-		public function get url():String
-		{
-			return _url;
+			if(_preUrl != value)
+			{
+				_frame = headFrame;
+				_preUrl = value;
+				_resUrl = _preUrl + ".res.atf";
+				if(_visible)
+					getRes();
+			}
 		}
 		public function setFrame(index:int):void
 		{
+			if(_lock) return;
 			_frame = index;
-			if(graphicInfo) graphicInfo.setFrame(index);
+			if(graphicInfo) 
+				graphicInfo.setFrame(index);
 		}
 		public function hFlip(value:Boolean):void
 		{
@@ -72,31 +81,47 @@ package gameUnit
 		public function hide():void
 		{
 			_visible = false;
-			GraphicsEngine.getInstance().removeOneObj(property.id);
+			GraphicsEngine.getInstance().removeOneObj(id);
 		}
-		
 		public function move(x:Number,y:Number):void
 		{
 			_x = x;
 			_y = y;
 			if(graphicInfo)
-				graphicInfo.move(x,y,0);
+				graphicInfo.move(x,y,level);
 		}
-		
 		protected function getRes():void
 		{
 			_resReady = 0;
-			if(property.isAnimated)
-				ResourceManager.getInstance().loadBinFile(url+".config.gif",configCallback);
+			_lock = true;
+			if(isAnimated)
+			{
+				if(RenderProperty.data[_resUrl] != undefined)
+				{
+					_resReady++;
+				}
+				else
+					ResourceManager.getInstance().loadBinFile(_preUrl + ".config.gif",configCallback);
+			}
 			else
 				_resReady++;
-			ResourceManager.getInstance().loadBinFile(url+".res.atf",resourceCallback);
+			ResourceManager.getInstance().loadBinFile(_preUrl + ".res.atf",resourceCallback);
 		}
-		private function configCallback(data:ByteArray):void
+		private function configCallback(data:ByteArray,url:String):void
 		{
+			if(RenderProperty.data[_resUrl] != undefined)
+			{
+				_resReady++;
+				checkRes();
+				return;
+			}
+			RenderProperty.data[_resUrl] = new RenderProperty();
+			RenderProperty.data[_resUrl].texCoodinates = [];
 			var len:int = data.length;
-			property.texSize = data.readInt();
-			len -= 4;
+			RenderProperty.data[_resUrl].texId = _resUrl;
+			RenderProperty.data[_resUrl].texSizeX = data.readInt();
+			RenderProperty.data[_resUrl].texSizeY = data.readInt();
+			len -= 8;
 			while(len)
 			{
 				var xoff:int = data.readInt();
@@ -105,13 +130,13 @@ package gameUnit
 				var by:int = data.readInt();
 				var width:int = data.readInt();
 				var height:int = data.readInt();
-				property.texCoodinates.push(new TextureCoodinate(Number(xoff),Number(yoff),1,1,new Rectangle(bx,by,width,height),512));
+				RenderProperty.data[_resUrl].texCoodinates.push(new TextureCoodinate(Number(xoff),Number(yoff),1,1,new Rectangle(bx,by,width,height),512));
 				len -= 24;
 			}
 			_resReady++;
 			checkRes();
 		}
-		private function resourceCallback(data:ByteArray):void
+		private function resourceCallback(data:ByteArray,url:String):void
 		{
 			_resReady++;
 			_resData = data;
@@ -121,11 +146,18 @@ package gameUnit
 		{
 			if(_resReady >= 2)
 			{
-				GraphicsEngine.getInstance().getCompressedTextureFromByteArray(_resData,property.texId,property.texSize,property.texSize,true);
+				var property:RenderProperty = RenderProperty.data[_resUrl];
+				GraphicsEngine.getInstance().getCompressedTextureFromByteArray(_resData,property.texId,property.texSizeX,property.texSizeY,true);
 				if(_visible)
-					GraphicsEngine.getInstance().addBatchSquare(getGraphicInfo());
-				if(graphicInfo) 
-				{
+				{	
+					if(!graphicInfo)
+						GraphicsEngine.getInstance().addBatchSquare(getGraphicInfo());
+					else
+					{
+						GraphicsEngine.getInstance().updateBatchSquareTex(graphicInfo,property.texId);
+						graphicInfo.textureCoordinates = property.texCoodinates;
+					}
+					_lock = false;
 					graphicInfo.setFrame(_frame);
 					graphicInfo.move(_x,_y,0);
 				}
@@ -133,16 +165,17 @@ package gameUnit
 		}
 	    public function getGraphicInfo():Base2DRectObjInfo
 		{
+			var property:RenderProperty = RenderProperty.data[_resUrl];
 			if(graphicInfo == null)
-				graphicInfo = Base2DRectObjInfo.getInstance(property.id,property.texId,0,0,0,0,0,property.texCoodinates,0,0,0,property.scaleX,property.scaleY);
-			if(_body) _body.bindTarget(graphicInfo,property.id);
+				graphicInfo = Base2DRectObjInfo.getInstance(id,property.texId,0,0,0,0,0,property.texCoodinates,0,0,0,scaleX,scaleY);
+			if(_body) _body.bindTarget(graphicInfo,id);
 			return graphicInfo;
 		}
 		public function dispose():void
 		{
-			property.reset();
 			graphicInfo = null;
-			url = "";
+			_resUrl = "";
+			_preUrl = "";
 			_resData = null;
 			_resReady = 0;
 			_visible = false;

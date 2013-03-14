@@ -1,25 +1,17 @@
 package gameUnit.data
 {
+	import flash.utils.Dictionary;
+
 	public class RenderProperty
 	{
-		public var id:String;
+		public static var data:Dictionary = new Dictionary();
+		
 		public var texId:String;
-		public var texSize:int;
-		public var texCoodinates:Array = [];
-		public var scaleX:Number = 1;
-		public var scaleY:Number = 1;
-		public var isAnimated:Boolean;
+		public var texSizeX:int;
+		public var texSizeY:int;
+		public var texCoodinates:Array;
 		public function RenderProperty()
 		{
-		}
-		public function reset():void
-		{
-			id = "";
-			texId = "";
-			texCoodinates = [];
-			scaleX = 1;
-			scaleY = 1;
-			isAnimated = false;
 		}
 	}
 }

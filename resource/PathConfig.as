@@ -7,7 +7,7 @@ package resource
 		}
 		public static function getCharacterResPath():String
 		{
-			return "res\\character\\1.swf";
+			return "res\\character\\";
 		}
 		
 		public static function getMapThumbResPath(id:int):String

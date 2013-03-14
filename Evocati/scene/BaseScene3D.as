@@ -1,9 +1,9 @@
 package Evocati.scene
 {
+	import flash.utils.Dictionary;
+	
 	import Evocati.object.Base2DRectObjInfo;
 	import Evocati.object.Group2DRectObjInfo;
-	
-	import flash.utils.Dictionary;
 
 	public class BaseScene3D
 	{
@@ -36,7 +36,7 @@ package Evocati.scene
 				_totalList[info.id] = [info,""];
 		}
 		
-		public function removeOneObj(id:String):void
+		public function removeOneObj(id:String,isDispose:Boolean = true):void
 		{
 			if(_totalList[id] != undefined)
 			{
@@ -54,6 +54,8 @@ package Evocati.scene
 						delete  _batchObjList[arr[1]];
 				}
 				delete _totalList[id];
+				if(isDispose)
+					info.dispose();
 			}
 			else
 			{

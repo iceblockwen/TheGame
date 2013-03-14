@@ -7,6 +7,7 @@ package Evocati
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display3D.Context3D;
+	import flash.display3D.Context3DCompareMode;
 	import flash.display3D.Context3DTriangleFace;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -189,9 +190,9 @@ package Evocati
 		/**
 		 * 删除场景中单个矩形
 		 */
-		public function removeOneObj(id:String):void
+		public function removeOneObj(id:String,isDispose:Boolean = true):void
 		{
-			_scene.removeOneObj(id);
+			_scene.removeOneObj(id,isDispose);
 			
 		}
 		
@@ -223,9 +224,10 @@ package Evocati
 		 */
 		public function updateBatchSquareTex(info:Base2DRectObjInfo,batchId:String):void
 		{
+			info.textureId = batchId;
 			if(_scene.isObjInBatch(info.id,batchId))
 				return;
-			removeOneObj(info.id);
+			removeOneObj(info.id,false);
 			addBatchSquare(info);
 		}		
 		/**
@@ -357,8 +359,9 @@ package Evocati
 		private function configEngine(config:Configration = null):void
 		{
 			if(context3D == null) return;
-			context3D.configureBackBuffer(commonData.gameWidth, commonData.gameHeight, 0, false);
+			context3D.configureBackBuffer(commonData.gameWidth, commonData.gameHeight, 0, true);
 			context3D.setCulling( Context3DTriangleFace.BACK);
+			context3D.setDepthTest(false,Context3DCompareMode.LESS);
 			
 			if(config)
 				mainConfig = config;
@@ -560,7 +563,6 @@ package Evocati
 				}
 			}
 			context3D.setProgram ( shaderManager.getShaders("PARTICLE_LINK","COMMON_PARTICLE_LINK_DXT5"));
-//			context3D.setCulling(Context3DTriangleFace.NONE); 
 			for each(var link:ParticleLink in particleSystem._particleLinkList)
 			{
 				if(renderManager.setLinkParticleData(link))

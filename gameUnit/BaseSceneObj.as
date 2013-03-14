@@ -5,14 +5,15 @@ package gameUnit
 	public class BaseSceneObj
 	{
 		protected var _rigidBody:BaseRigidBody;
-		protected var _renderObj:RenderUnit;
+		protected var _renderObjs:Array;
 		
+		public var id:String;
 		public var x:Number;
 		public var y:Number;
 		private var _visible:Boolean;
 		public function BaseSceneObj()
 		{
-			
+			_renderObjs = [];
 		}
 		public function move(mx:Number,my:Number):void
 		{
@@ -21,7 +22,12 @@ package gameUnit
 			if(_rigidBody)
 				_rigidBody.move(x,y);
 			else
-				_renderObj.move(x,y);
+			{
+				for each(var part:RenderUnit in _renderObjs)
+				{
+					part.move(x,y);
+				}
+			}
 		}
 		
 		public function set visible(value:Boolean):void
@@ -29,11 +35,17 @@ package gameUnit
 			_visible = value;
 			if(value)
 			{
-				_renderObj.show();
+				for each(var part:RenderUnit in _renderObjs)
+				{
+					part.show();
+				}
 			}
 			else
 			{
-				_renderObj.hide();
+				for each(part in _renderObjs)
+				{
+					part.hide();
+				}
 			}
 		}
 	}

@@ -96,6 +96,7 @@ package Evocati.object
 			rz = 0;
 			textureCoordinates = null;
 			textureIndex = 0;
+			pool.push(this);
 		}
 		public function reset(pId:String,pTextureId:String,pSizeX:Number,pSizeY:Number,pX:Number,pY:Number,pZ:Number,pTextureCoordinates:Array = null,prx:Number = 0,pry:Number = 0,prz:Number = 0,nScaleX:Number = 1,nScaleY:Number = 1):void
 		{

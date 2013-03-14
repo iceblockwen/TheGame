@@ -30,7 +30,7 @@ package gameWorld
 			ResourceManager.getInstance().loadBinFile(PathConfig.getMapThumbResPath(mapId),finishLoadThumb);
 		}
 		
-		private function finishLoadThumb(data:ByteArray):void
+		private function finishLoadThumb(data:ByteArray,url:String):void
 		{
 			GraphicsEngine.getInstance().getCompressedMapTextureFromByteArray(data,"thumb"+mapId,256,128,false);
 			_ThumbMap = Base2DRectObjInfo.getInstance("thumb"+mapId,"thumb"+mapId,mapWidth,mapHeight,0,0,0);

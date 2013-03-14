@@ -132,8 +132,11 @@ package Evocati.manager
 		{
 			if(_textureList[id] != undefined)
 			{
-				_textureList[id][0].dispose();
-				vramUse -= _textureList[id][1][0]*_textureList[id][1][1]*4/1024;
+//				_textureList[id][0].dispose();
+//				vramUse -= _textureList[id][1][0]*_textureList[id][1][1]*4/1024;
+//				trace("已经有此纹理资源! id:"+id);
+				return;
+				
 			}
 			_textureList[id] = [];
 			var cSizeX:Number = TexturePacker.getCompatibleSize(sizeX);
@@ -150,11 +153,13 @@ package Evocati.manager
 		{
 			if(_textureList[id] != undefined)
 			{
-				_textureList[id][0].dispose();
-				if(_textureList[id][2])
-					vramUse -= _textureList[id][2];
-				else
-					vramUse -= _textureList[id][1][0]*_textureList[id][1][1]*4/1024;
+//				_textureList[id][0].dispose();
+//				if(_textureList[id][2])
+//					vramUse -= _textureList[id][2];
+//				else
+//					vramUse -= _textureList[id][1][0]*_textureList[id][1][1]*4/1024;
+//				trace("已经有此纹理资源! id:"+id);
+				return;
 			}
 			_textureList[id] = [];
 			var cSizeX:Number = TexturePacker.getCompatibleSize(sizeX);
@@ -177,7 +182,7 @@ package Evocati.manager
 			if(_mapTextureList[id] != undefined)
 			{
 				//_mapTextureList[id].dispose();
-				trace("已经有此纹理资源! id:"+id);
+//				trace("已经有此纹理资源! id:"+id);
 				return;
 			}
 			_mapTextureList[id] = [];
@@ -197,7 +202,7 @@ package Evocati.manager
 			if(_mapTextureList[id] != undefined)
 			{
 				//_mapTextureList[id].dispose();
-				trace("已经有此纹理资源! id:"+id);
+//				trace("已经有此纹理资源! id:"+id);
 				return;
 			}
 			_mapTextureList[id] = [];

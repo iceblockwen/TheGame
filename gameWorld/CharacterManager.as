@@ -3,8 +3,10 @@ package gameWorld
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	import gameUnit.character.Player;
 	import gameUnit.character.Role;
 	import gameUnit.character.Self;
+	import gameUnit.data.PlayerVO;
 	import gameUnit.data.RoleVO;
 
 	public class CharacterManager
@@ -34,9 +36,12 @@ package gameWorld
 			characters[selfPlayer.data.id] = selfPlayer;
 			return selfPlayer;
 		}
-		public function addCharacter():void
+		public function addPlayer(vo:PlayerVO):Player
 		{
-			
+			var player:Player = Player.getInstanece();
+			player.data = vo;
+			characters[vo.id] = player;
+			return player;
 		}
 		protected function onKeyInput(event:Event):void
 		{

@@ -1,29 +1,74 @@
 package gameUnit.character
 {
+	import flash.events.Event;
+	
 	import gameUnit.BaseSceneObj;
 	import gameUnit.RenderUnit;
+	import gameUnit.action.CharacterAction;
 	import gameUnit.animation.FrameAnimationCtrl;
-	import gameUnit.animation.data.FrameAnimationGraph;
 	import gameUnit.data.RoleVO;
 	
 	import global.DirectionType;
-	
-	import resource.PathConfig;
 
 	public class Role extends BaseSceneObj
 	{
-		public static const MOV_STAND:int = 0;
-		public static const MOV_RUN:int = 1;
-		
 		protected var _data:RoleVO;
-		protected var _movementState:int;
+		protected var _curSpeedX:Number = 0;
+		protected var _curSpeedY:Number = 0;
+		protected var _currentAct:CharacterAction;
+
 		public var direction:int = 0;
-		public var speed:Number = 0.2;
+		public var speed:Number = 0.3;
+		public var airSpeed:Number;
+		public var gravity:Number = 1.2;
+		public var jumpHeight:Number = 0;
+		public var groundY:Number = 0;
 		
-		public var frameAnimationCtrl:FrameAnimationCtrl = new FrameAnimationCtrl();
+		public var frameAnimationCtrls:Array;
+		
+		protected var DEFAULT_ACTION:CharacterAction;
+		
 		public function Role()
 		{
+			frameAnimationCtrls = [];
+			DEFAULT_ACTION = CharacterAction.STATIC_ACTION_STAND;
+		}
+		public function set data(value:RoleVO):void
+		{
+			_data = value;
+			id = _data.id;
+			initFigure();
+		}
+		public function get data():RoleVO
+		{
+			return _data;
+		}
+		public function setAction(act:CharacterAction):void
+		{
+			if((_currentAct && _currentAct.block) || (act != null && _currentAct == act))
+				return;
+			_currentAct = act?act:DEFAULT_ACTION;
+			if(_currentAct.type == CharacterAction.ACTION_JUMP)
+			{
+				jumpHeight = 0;
+				groundY = y;
+				airSpeed = -speed *2;
+			}
+			else if(_currentAct.type == CharacterAction.ACTION_STAND)
+			{
+				_curSpeedX = 0;
+				_curSpeedY = 0;
+			}
 			
+			var animation:Array = _currentAct.animationQueue[_currentAct.animationIndex];
+			for each(var ctrl:FrameAnimationCtrl in frameAnimationCtrls)
+			{
+				ctrl.setAnimation(animation[0],animation[1]);
+			}
+		}
+		protected function initFigure():void
+		{
+			setAction(DEFAULT_ACTION);
 		}
 		protected function moveOneStep(duration:int):void
 		{
@@ -34,52 +79,84 @@ package gameUnit.character
 				dirX = 0.71*dirX;
 				dirY = 0.71*dirY;
 			}
-			move(x + speed*duration*dirX,y + speed*duration*dirY);
+			_curSpeedX = speed*dirX;
+			_curSpeedY = speed*dirY;
+			move(x + _curSpeedX*duration,y + _curSpeedY*duration);
 		}
-		public function set data(value:RoleVO):void
+		protected function jumpOneStep(duration:int):void
 		{
-			_data = value;
-			initFigure();
+			airSpeed += gravity*duration/1000;
+			jumpHeight += airSpeed*duration;
+			if(jumpHeight >= 0)
+			{
+				_currentAct.dispose();
+				_currentAct = null;
+				jumpHeight = 0;
+			}
+			move(x + _curSpeedX*duration,groundY + jumpHeight);
 		}
-		public function get data():RoleVO
+		protected function onFinishAnimation(event:Event):void
 		{
-			return _data;
-		}
-		protected function initFigure():void
-		{
-			if(_renderObj == null) 
-				_renderObj = RenderUnit.getInstance();
-			_renderObj.property.isAnimated = true;
-			_renderObj.url = PathConfig.getCharacterResPath();
-			_renderObj.setFrame(0);
-			frameAnimationCtrl.setGraph(new FrameAnimationGraph());
-			frameAnimationCtrl.fps = 15;
-			frameAnimationCtrl.target = _renderObj;
-			frameAnimationCtrl.setAct(FrameAnimationGraph.ACT_STAND);
+			if(_currentAct == null) 
+				return;
+			_currentAct.animationIndex ++;
+			var animation:Array = _currentAct.animationQueue[_currentAct.animationIndex];
+			if(animation)
+			{
+				for each(var ctrl:FrameAnimationCtrl in frameAnimationCtrls)
+				{
+					ctrl.setAnimation(animation[0],animation[1]);
+				}
+			}
+			else if(_currentAct.defaultAnimation)
+			{
+				for each (ctrl in frameAnimationCtrls)
+				{
+					ctrl.setAnimation(_currentAct.defaultAnimation[0],_currentAct.defaultAnimation[1]);
+				}
+			}
+			else
+			{
+				_currentAct.dispose();
+				_currentAct = null;
+			}
 		}
 		protected function setDirection():void
 		{
 			var dirX:int = DirectionType.getDirX(direction);
 			if(dirX == 1)
-				_renderObj.hFlip(false);
+			{
+				for each(var unit:RenderUnit in _renderObjs)
+				{
+					unit.hFlip(false);
+				}
+			}
 			else if(dirX == -1)
-				_renderObj.hFlip(true);
+			{
+				for each(unit in _renderObjs)
+				{
+					unit.hFlip(true);
+				}
+			}
 		}
 		public function update(duration:int):void
 		{
-			if(_movementState == MOV_RUN)
+			if(_currentAct == null)
+				return;
+			_currentAct.update(duration);
+			if(_currentAct.type == CharacterAction.ACTION_RUN)
+			{
 				moveOneStep(duration);
+			}
+			else if(_currentAct.type == CharacterAction.ACTION_JUMP)
+			{
+				jumpOneStep(duration);
+			}
 			setDirection();
-			frameAnimationCtrl.update(duration);
-		}
-		
-		public function updateMovementState(type:int):void
-		{
-			_movementState = type;
-			if(_movementState == MOV_STAND)
-				frameAnimationCtrl.setAct(FrameAnimationGraph.ACT_STAND);
-			else if(_movementState == MOV_RUN)
-				frameAnimationCtrl.setAct(FrameAnimationGraph.ACT_RUN);
+			for each (var ctrl:FrameAnimationCtrl in frameAnimationCtrls)
+			{
+				ctrl.update(duration);
+			}
 		}
 	}
 }

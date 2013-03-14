@@ -1,21 +1,24 @@
 package gameUnit.animation
 {
-	import Interface.IFrameAnimation;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	
-	import gameUnit.animation.data.FrameAnimationGraph;
+	import data.FrameAnimationConfig;
+	
+	import gameUnit.RenderUnit;
 
-	public class FrameAnimationCtrl
+	public class FrameAnimationCtrl extends EventDispatcher
 	{
 		public var pool:Array = [];
+		public static var ANIMATION_EVT_FINISH:Event = new Event("ANIMATION_EVT_FINISH");
 		
 		/**动画目标*/
-		private var _target:IFrameAnimation
+		private var _target:RenderUnit
 		/**播放索引长度 */
 		private var _length:int
-		/**回放帧索引 */
-		private var _playbackGraph:FrameAnimationGraph;
 		/**当前回放帧 */
 		private var _curPlaybackArray:Array;
+		
 		/**基本回放状态
 		 * CIRCLE: 循环播放
 		 * REVERSE:倒序循环播放
@@ -26,7 +29,7 @@ package gameUnit.animation
 		/**刷新间隔帧数 */
 		public var frameSkip:int;  
 		/**播放索引次数 */
-		public var playbackTimes:int = -1;
+		private var _playbackTimes:int = -1;
 		
 		public static const CIRCLE:int = 0;
 		public static const REVERSE:int = 1;
@@ -43,16 +46,20 @@ package gameUnit.animation
 		{
 			return;
 		}
-		public function setGraph(graph:FrameAnimationGraph):void
+		public function setAnimation(type:int,times:int = -1):void
 		{
-			_playbackGraph = graph;
-		}
-		public function setAct(type:int):void
-		{
-			_curPlaybackArray = _playbackGraph.frameQueue[type];
+			_playbackTimes = times;
+			state = CIRCLE;
+			var info:Array = FrameAnimationConfig.configData[_target.animationId].frameQueue[type] as Array;
+			_curPlaybackArray = info[0];
 			_length = _curPlaybackArray.length;
+			if(_target)
+			{
+				_target.setPreUrl(info[1],info[0][0]);
+				_currentFrame = 0;
+			}
 		}
-		public function set target(value:IFrameAnimation):void
+		public function set target(value:RenderUnit):void
 		{
 			_target = value;
 		}
@@ -61,13 +68,14 @@ package gameUnit.animation
 			_currentFrame+=n;
 			if(_currentFrame >= _length)
 			{
-				if(playbackTimes > 0)
-					playbackTimes --;
-				if(playbackTimes == 0)
+				if(_playbackTimes > 0)
+					_playbackTimes --;
+				if(_playbackTimes == 0)
 				{
 					state = FIXED;
+					dispatchEvent(ANIMATION_EVT_FINISH);
 				}
-				else if(playbackTimes == -1)
+				else if(_playbackTimes == -1)
 				{
 					_currentFrame = (_currentFrame-_length)%_length;
 				}

@@ -6,7 +6,7 @@ package gameWorld
 	
 	import Interface.ITick;
 	
-	import gameUnit.animation.data.FrameAnimationGraph;
+	import gameUnit.action.CharacterAction;
 	
 	import global.DirectionType;
 	import global.GlobalData;
@@ -95,57 +95,75 @@ package gameWorld
 			var s:Boolean = downKeys.indexOf(KeyType.S) != -1
 			var a:Boolean = downKeys.indexOf(KeyType.A) != -1
 			var d:Boolean = downKeys.indexOf(KeyType.D) != -1
+			var j:Boolean = downKeys.indexOf(KeyType.J) != -1;
+			var u:Boolean = downKeys.indexOf(KeyType.U) != -1;
+			var space:Boolean = downKeys.indexOf(KeyType.SPACE) != -1;
+			if(space)
+			{
+				GlobalData.self.setAction(CharacterAction.getInstanceByType(CharacterAction.ACTION_JUMP));
+			}
+			if(j)
+			{
+				GlobalData.self.setAction(CharacterAction.getInstanceByType(CharacterAction.ACTION_ATTACK1));
+				return;
+			}
+			if(u)
+			{
+				GlobalData.self.setAction(CharacterAction.getInstanceByType(CharacterAction.ACTION_ATTACK2));
+				return;
+			}
+			
 			if(w && !a && !s && !d)
 			{
 				GlobalData.self.direction = DirectionType.TOP;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(s && !a && !w && !d)
 			{
 				GlobalData.self.direction = DirectionType.BOTTOM;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(a && !w && !s && !d)
 			{
 				GlobalData.self.direction = DirectionType.LEFT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(d && !a && !s && !w)
 			{
 				GlobalData.self.direction = DirectionType.RIGHT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(w && a && !s && !d)
 			{
 				GlobalData.self.direction = DirectionType.TOP_LEFT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(s && a && !w && !d)
 			{
 				GlobalData.self.direction = DirectionType.BOTTOM_LEFT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(!a && !w && s && d)
 			{
 				GlobalData.self.direction = DirectionType.BOTTOM_RIGHT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else if(d && !a && !s && w)
 			{
 				GlobalData.self.direction = DirectionType.TOP_RIGHT;
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_RUN);
+				GlobalData.self.setAction(CharacterAction.STATIC_ACTION_RUN);
 				return;
 			}
 			else
 			{
-				GlobalData.self.updateMovementState(FrameAnimationGraph.ACT_STAND);
+  				GlobalData.self.setAction(null);
 			}
 		}
 			

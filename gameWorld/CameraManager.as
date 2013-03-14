@@ -18,9 +18,9 @@ package gameWorld
 		private var _curPoint:Point;
 		
 		private var _interval:int;
-		private var _speed:Number = 2;
+		private var _speed:Number = 5;
 		
-		private var TRACE_INTERVAL:int = 60;
+		private var TRACE_INTERVAL:int = 100;
 		public function CameraManager()
 		{
 			_curPoint= new Point();
@@ -45,15 +45,15 @@ package gameWorld
 		}
 		public function update(duration:int):void
 		{
-			_interval += duration;
+//			_interval += duration;
 			var time:Number = duration/1000;
-			if(_interval >TRACE_INTERVAL)
-			{
-				_interval = 0;
-				_desPoint = new Point(_target.x,_target.y)
-			}
-			var offX:Number = _desPoint.x - _curPoint.x;
-			var offY:Number = _desPoint.y - _curPoint.y;
+//			if(_interval >TRACE_INTERVAL)
+//			{
+//				_interval = 0;
+//				_desPoint = new Point(_target.x,_target.y)
+//			}
+			var offX:Number = _target.x - _curPoint.x;
+			var offY:Number = _target.y - _curPoint.y;
 			
 			_curPoint.x += _speed*time*offX;
 			_curPoint.y += _speed*time*offY;

@@ -50,8 +50,12 @@ package resource
 			_loading = true;
 			if(resourceCache[url] != null || resourceCache[url] != undefined)
 			{
+				_loading = false;
 				if(callback)
-					callback(resourceCache[url]);
+					callback(resourceCache[url],_currentURL);
+				var nextUrl:Array = _urlLoaderQueue.shift();
+				if(nextUrl)
+					loadBinFile(nextUrl[0],nextUrl[1]);
 				return;
 			}
 			if(callback)
@@ -67,7 +71,7 @@ package resource
 			if(resourceCache[url] != null || resourceCache[url] != undefined)
 			{
 				if(callback)
-					callback(resourceCache[url]);
+					callback(resourceCache[url],_currentURL);
 				return;
 			}
 			_mainLoader.load(new URLRequest(url));
@@ -83,7 +87,7 @@ package resource
 			if(_mainLoader.content)
 			{
 				resourceCache[info.url] = _mainLoader.content;
-				_callbackList[info.url](_mainLoader.content);
+				_callbackList[info.url](_mainLoader.content,_currentURL);
 			}
 		}
 		private function urlLoaderCallback(e:Event):void
@@ -94,7 +98,7 @@ package resource
 			if(info.data)
 			{
 				resourceCache[_currentURL] = info.data as ByteArray;
-				_callbackList[_currentURL](info.data);
+				_callbackList[_currentURL](info.data,_currentURL);
 			}
 			var nextUrl:Array = _urlLoaderQueue.shift();
 			if(nextUrl)
