@@ -14,5 +14,9 @@ package resource
 		{
 			return "res\\map\\" + id +"\\thumb.atf";
 		}
+		public static function getMapResPath(id:int,row:int,col:int):String
+		{
+			return "res\\map\\" + id +"\\" + row + "_" + col + ".atf";
+		}
 	}
 }

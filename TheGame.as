@@ -7,10 +7,12 @@ package
 	
 	import Evocati.GraphicsEngine;
 	
+	import gameWorld.CameraManager;
 	import gameWorld.InputManager;
 	import gameWorld.LevelManager;
 	
 	import global.GameConstant;
+	import global.GlobalData;
 	
 	import resource.ResourceManager;
 	
@@ -25,7 +27,7 @@ package
 		private function initGame(e:Event):void
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,initGame);
-			
+			GlobalData.stage = stage;
 			stage.frameRate = 60;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
@@ -50,6 +52,7 @@ package
 			GameConstant.gameWidth = stage.stageWidth;
 			GameConstant.gameHight = stage.stageHeight;
 			GraphicsEngine.getInstance().setGameSize(GameConstant.gameWidth,GameConstant.gameHight);
+			CameraManager.getInstance().resize();
 		}
 	}
 }

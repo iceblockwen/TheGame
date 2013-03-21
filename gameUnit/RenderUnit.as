@@ -5,10 +5,9 @@ package gameUnit
 	
 	import Evocati.GraphicsEngine;
 	import Evocati.object.Base2DRectObjInfo;
-	import Evocati.object.BaseRigidBody;
 	import Evocati.textureUtils.TextureCoodinate;
 	
-	import gameUnit.data.RenderProperty;
+	import gameUnit.dataVO.RenderProperty;
 	
 	import resource.ResourceManager;
 
@@ -24,7 +23,6 @@ package gameUnit
 		private var _resData:ByteArray;
 		private var _resReady:int;
 		private var _visible:Boolean;
-		private var _body:BaseRigidBody;
 		private var _frame:int = 0;
 		private var _lock:Boolean = false;
 		
@@ -168,7 +166,6 @@ package gameUnit
 			var property:RenderProperty = RenderProperty.data[_resUrl];
 			if(graphicInfo == null)
 				graphicInfo = Base2DRectObjInfo.getInstance(id,property.texId,0,0,0,0,0,property.texCoodinates,0,0,0,scaleX,scaleY);
-			if(_body) _body.bindTarget(graphicInfo,id);
 			return graphicInfo;
 		}
 		public function dispose():void
@@ -179,7 +176,6 @@ package gameUnit
 			_resData = null;
 			_resReady = 0;
 			_visible = false;
-			_body = null;
 			pool.push(this);
 		}
 	}

@@ -11,7 +11,7 @@ package gameUnit.character
 		
 		public function Player()
 		{
-			
+			super();
 		}
 		public static function getInstanece():Player
 		{
@@ -40,7 +40,7 @@ package gameUnit.character
 			frameAnimationCtrls[PART_BODY].target = _renderObjs[PART_BODY];
 			frameAnimationCtrls[PART_WEAPON].target = _renderObjs[PART_WEAPON];
 			frameAnimationCtrls[PART_BODY].addEventListener("ANIMATION_EVT_FINISH",onFinishAnimation);
-			setAction(DEFAULT_ACTION);
+			setAnimation();
 		}
 		
 		public function dispose():void

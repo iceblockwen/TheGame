@@ -6,13 +6,12 @@ package Evocati.object
 	import flash.text.TextField;
 	
 	import Evocati.Interface.IObj3D;
-	import Evocati.Interface.ISceneObj;
 	import Evocati.scene.QuadTreeNode;
 
-	public class BaseRigidBody implements ISceneObj
+	public class BaseRigidBody
 	{
 		public var pos:Point = new Point();
-//		public var posZ:Number;
+		public var posZ:Number;
 		public var width:int = 64;
 		public var height:int = 64;
 		public var rect:Rectangle = new Rectangle(0,0,64,64);
@@ -36,10 +35,11 @@ package Evocati.object
 			target = obj;
 			id = pid;
 		}
-		public function move(x:int,y:int):void
+		public function move(x:int,y:int,z:int):void
 		{
-			target.move(x,y,0);
+			target.move(x,y,z);
 			pos.setTo(x,y);
+			posZ = z;
 			setCurrentRect(width,height);
 			if(sectionTxt)
 			{
@@ -54,9 +54,9 @@ package Evocati.object
 				sectionTxt.text = value + "";
 		}
 		
-		public function moveBy(x:int,y:int):void
+		public function moveBy(x:int,y:int,z:int):void
 		{
-			move(pos.x+x,pos.y+y);
+			move(pos.x+x,pos.y+y,posZ+z);
 		}
 		public function testPoint(point:Point):Boolean
 		{

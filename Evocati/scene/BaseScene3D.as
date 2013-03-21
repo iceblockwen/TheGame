@@ -12,6 +12,7 @@ package Evocati.scene
 		public var _totalList:Dictionary;
 		public var _mapTileList:Dictionary;
 		public var _groupObjList:Dictionary;
+		public var _mapThumb:Base2DRectObjInfo;
 		public function BaseScene3D()
 		{
 			_singleObjList = [];
@@ -82,6 +83,12 @@ package Evocati.scene
 				trace("已经有此id地图块"+info.id);
 			else
 				_mapTileList[info.id] = info;
+		}
+		public function setMapthumb(info:Base2DRectObjInfo):void
+		{
+			if(_mapThumb) 
+				_mapThumb.dispose();
+			_mapThumb = info;
 		}
 		
 		public function findTile(id:String):Base2DRectObjInfo

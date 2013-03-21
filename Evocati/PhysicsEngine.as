@@ -55,7 +55,7 @@ package Evocati
 					body.velocity.x = -body.velocity.x;
 				if(body.pos.y > 200 || body.pos.y < 0)
 					body.velocity.y = -body.velocity.y;
-				body.moveBy(time*body.velocity.x,time*body.velocity.y);
+				body.moveBy(time*body.velocity.x,time*body.velocity.y,0);
 				reInsert(body);
 			}	
 			while(++i<len)

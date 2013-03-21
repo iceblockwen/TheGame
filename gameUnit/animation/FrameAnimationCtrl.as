@@ -3,7 +3,7 @@ package gameUnit.animation
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import data.FrameAnimationConfig;
+	import gameConfig.FrameAnimationConfig;
 	
 	import gameUnit.RenderUnit;
 
@@ -31,6 +31,8 @@ package gameUnit.animation
 		/**播放索引次数 */
 		private var _playbackTimes:int = -1;
 		
+		private var _curAnimationType:int = -1;
+		
 		public static const CIRCLE:int = 0;
 		public static const REVERSE:int = 1;
 		public static const FIXED:int = 2;
@@ -55,6 +57,7 @@ package gameUnit.animation
 			_length = _curPlaybackArray.length;
 			if(_target)
 			{
+				fps = info[2];
 				_target.setPreUrl(info[1],info[0][0]);
 				_currentFrame = 0;
 			}
@@ -106,31 +109,17 @@ package gameUnit.animation
 			if(_acFrame % (frameSkip+1) != 0) return;
 			
 			var state:int = state;
-			switch(state)
+			if(state == CIRCLE)
 			{
-				case CIRCLE:
-				{
-					_target.setFrame(getNextFrame(_acTime*fps*_fpsMultiplier / 1000 ));
-					break;
-				}
-					
-				case REVERSE:
-				{
-					_target.setFrame(getPreFrame(_acTime*fps*_fpsMultiplier / 1000 ));
-					break;
-				}
-					
-				case FIXED:
-				{
-					_target.setFrame(_currentFrame);
-					break;
-				}
-					
-				default:
-				{
-					_target.setFrame(_currentFrame);
-					break;
-				}
+				_target.setFrame(getNextFrame(_acTime*fps*_fpsMultiplier / 1000 ));
+			}
+			else if(state == CIRCLE)	
+			{
+				_target.setFrame(getPreFrame(_acTime*fps*_fpsMultiplier / 1000 ));
+			}
+			else if(state == FIXED)
+			{
+				_target.setFrame(_currentFrame);
 			}
 			
 			if( _acTime >= 1000/(fps*_fpsMultiplier)) _acTime = 0;

@@ -203,6 +203,13 @@ package Evocati
 		{
 			_scene.addMapTile(info);
 		}
+		/**
+		 * 向场景增加地图块
+		 */
+		public function setMapthumb(info:Base2DRectObjInfo):void
+		{
+			_scene.setMapthumb(info);
+		}
 		
 		/**
 		 * 删除场景地图块
@@ -486,17 +493,21 @@ package Evocati
 			renderManager.setBlendmode(0);
 			
 			//渲染详细地图
-			registerManager.setTextureSizeToRegister(commonData.mapTextureSize);
+			if(_scene._mapThumb)
+			{
+				var thumb:Base2DRectObjInfo = _scene._mapThumb;
+				textureId = thumb.textureId;
+				textureManager.setMapTexture(textureId,0);
+				transformManager.setTransform(thumb.x, thumb.y, thumb.z, thumb.rx, thumb.ry, thumb.rz,
+					thumb.sizeX*2/commonData.gameWidth,
+					thumb.sizeY*2/commonData.gameHeight
+				);
+				draw();
+			}
 			for each(var k:Base2DRectObjInfo in  _scene._mapTileList)
 			{
-				var index:int =k.textureIndex;
 				textureId =  k.textureId;
 				textureManager.setMapTexture(textureId,0);
-//				registerManager.setUVToRegister(
-//					k.textureCoordinates[index].bound.width,
-//					k.textureCoordinates[index].bound.height,
-//					k.textureCoordinates[index].xOffset,
-//					k.textureCoordinates[index].yOffset);
 				transformManager.setTransform(k.x, k.y, k.z, k.rx, k.ry, k.rz,
 					k.sizeX*2/commonData.gameWidth,
 					k.sizeY*2/commonData.gameHeight
@@ -513,7 +524,7 @@ package Evocati
 			var i:int = -1;
 			while(++i < len)
 			{
-				index = _scene._singleObjList[i].textureIndex;
+				var index:int = _scene._singleObjList[i].textureIndex;
 				textureId =  _scene._singleObjList[i].textureId;
 				registerManager.setTextureSizeToRegister(TexturePacker.getCompatibleSize( _scene._singleObjList[i].textureCoordinates[index].texSize));
 				var obj:Base2DRectObjInfo = _scene._singleObjList[i];
